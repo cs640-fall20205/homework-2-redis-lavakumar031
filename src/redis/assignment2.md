@@ -11,28 +11,48 @@
 
 2. (1 point) What is the URL to Redis' documentation on its commands:
 ```
-
+https://redis.io/docs/latest/commands/
 ```
 
 3. (1 point) What is the runtime complexity (in Big-O notation) for LREM?
 ```
-
+The runtime complexity for the LREM operation in Redis is O(N), where N is the number of elements in the list
 ```
 
 4. (2 points) Create a structure to hold the value of your address with the key of your first name. For instance, mine would be “heidi”  “CS & IT Department, Herman Hall 207C, Western New England University, Springfield, MA, 01119”. Use the proper Redis command to show that the data has correctly been entered and followed by the results. Show both commands below including the prompts:
 ```
+127.0.0.1:6379[2]> SET Lavakumar "gateway, Room number 107, Springfield, MA, 01119"
+OK
+127.0.0.1:6379[2]> GET Lavakumar
+"gateway, Room number 107, Springfield, MA, 01119"
 
 ```
 
 5. (2 points) Create a hash structure to hold your WNE user name, first name, last name, and password. Of course provide a fake password. For instance, my data would be: “he302979”, “heidi”, “ellis”, “xxxx”.  Use the proper Redis command to show that the data has correctly been entered followed by the results. Show both commands below including the command prompts:
 
 ```
-
+127.0.0.1:6379[2]> HSET user:lk638568 username "lk638568" first "lava" last "kumar" password "568"
+(integer) 4
+127.0.0.1:6379[2]> HGETALL user:lk638568
+1) "username"
+2) "lk638568"
+3) "first"
+4) "lava"
+5) "last"
+6) "kumar"
+7) "password"
+8) "568"
 ```
 
 6. (2 points) Create a hash that holds your father’s and mother’s names as separate key-value pairs. Use the proper Redis commands to show that the data has correctly been entered followed by the results. Show both commands below including the command prompt:
 ```
-
+127.0.0.1:6379[2]> HSET parents father "Raghu" mother "Vasundara"
+(integer) 2
+127.0.0.1:6379[2]> HGETALL parents
+1) "father"
+2) "Raghu"
+3) "mother"
+4) "Vasundara"
 ```
 
 7. (3 points) Use a list to:
@@ -45,7 +65,23 @@
 
 Show the commands below including the command prompts:
 ```
-
+127.0.0.1:6379[2]> LPUSH my_stack pears
+(integer) 1
+127.0.0.1:6379[2]> LPUSH my_stack apples
+(integer) 2
+127.0.0.1:6379[2]> LPUSH my_stack peaches
+(integer) 3
+127.0.0.1:6379[2]> LPOP my_stack
+"peaches"
+127.0.0.1:6379[2]> LRANGE my_stack 0 -1
+1) "apples"
+2) "pears"
+127.0.0.1:6379[2]> LPUSH my_stack oranges
+(integer) 3
+127.0.0.1:6379[2]> LRANGE my_stack 0 -1
+1) "oranges"
+2) "apples"
+3) "pears"
 ```
 
 8.  (3 points)  In class we talked about the problem with name changes. For instance. Jane Ellen Doe might change her name to Jane Ellen Doe Fitzgerald where Ellen Doe becomes Jane’s middle name. Do the following:
@@ -55,17 +91,69 @@ Show the commands below including the command prompts:
 Write the commands below including the command prompts:
 
 ```
-
+127.0.0.1:6379[2]> HSET person:jane first "Jane" middle "Ellen" last "Doe"
+(integer) 3
+127.0.0.1:6379[2]> HGETALL person:jane
+1) "first"
+2) "Jane"
+3) "middle"
+4) "Ellen"
+5) "last"
+6) "Doe"
+127.0.0.1:6379[2]> MULTI
+OK
+127.0.0.1:6379[2]> HSET person:jane middle "Ellen Doe"
+QUEUED
+127.0.0.1:6379[2]> HSET person:jane last "Fitzgerald"
+QUEUED
+127.0.0.1:6379[2]> EXEC
+1) (integer) 0
+2) (integer) 0
+127.0.0.1:6379[2]> HGETALL person:jane
+1) "first"
+2) "Jane"
+3) "middle"
+4) "Ellen Doe"
+5) "last"
+6) "Fitzgerald"
 ```
 
 9. (2 points) Create a sorted set that holds the costs of the following items:  Cheetos: $2.99, apple: $1.00, Hershey’s: $3.45, and Coke: $1.79.  Print the set in ascending order.  Reduce the price of Hersheys by $1.00 using the ZINCRBY command. Print the set again in ascending order. Show the Redis commands below including the command prompts:
 ```
-
+127.0.0.1:6379[2]> ZADD prices 2.99 Cheetos 1.00 apple 3.45 Hersheys 1.79 Coke
+(integer) 4
+127.0.0.1:6379[2]> ZRANGE prices 0 -1 WITHSCORES
+1) "apple"
+2) "1"
+3) "Coke"
+4) "1.79"
+5) "Cheetos"
+6) "2.9900000000000002"
+7) "Hersheys"
+8) "3.4500000000000002"
+127.0.0.1:6379[2]> ZINCRBY prices -1.00 Hershey
+"-1"
+127.0.0.1:6379[2]> ZINCRBY prices -1.00 Hersheys
+"2.4500000000000002"
+127.0.0.1:6379[2]> ZRANGE prices 0 -1 WITHSCORES
+ 1) "Hershey"
+ 2) "-1"
+ 3) "apple"
+ 4) "1"
+ 5) "Coke"
+ 6) "1.79"
+ 7) "Hersheys"
+ 8) "2.4500000000000002"
+ 9) "Cheetos"
+10) "2.9900000000000002"
 ```
 
 10. (2 points) When using 2-factor authentication, many web sites send the user a link to confirm their identity. These links typically expire within 5 minutes. Reproduce this concept in Redis by storing a key named 'link' whose value is a URL (your choice), that expires in 5 minutes. Do it in a single command. Check to ensure that the link exists. Write the commands below including the command prompts:
 ```
-
+127.0.0.1:6379[2]> SET link "https://www.apple.com/in/" EX 300
+OK
+127.0.0.1:6379[2]> EXISTS link
+(integer) 1
 ```
 
 ## Day 2
